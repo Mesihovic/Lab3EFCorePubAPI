@@ -1,32 +1,56 @@
 using Microsoft.EntityFrameworkCore;
+using PubDBAPI;          
 using PublisherData;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-builder.Services.AddControllers();
-
-
-builder.Services.AddDbContext<PubContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("PubConnection"))
-);
-
-
+// OpenAPI + Swagger
 builder.Services.AddOpenApi();
+builder.Services.AddSwaggerGen();
+
+// DbContext
+builder.Services.AddDbContext<PubContext>(opt =>
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("PubConnection"))
+       .EnableSensitiveDataLogging()
+       .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
+
 
 var app = builder.Build();
-
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+var summaries = new[]
+{
+    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+};
 
-app.UseAuthorization();
+app.MapGet("/weatherforecast", () =>
+{
+    var forecast = Enumerable.Range(1, 5).Select(index =>
+        new WeatherForecast(
+            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+            Random.Shared.Next(-20, 55),
+            summaries[Random.Shared.Next(summaries.Length)]
+        ))
+        .ToArray();
 
-app.MapControllers();
+    return forecast;
+})
+.WithName("GetWeatherForecast");
+
+app.MapAuthorEndpoints();
 
 app.Run();
+
+public record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+{
+    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+}
+
+
