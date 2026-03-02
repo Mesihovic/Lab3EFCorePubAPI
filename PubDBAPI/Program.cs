@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 
+
 // DbContext
 builder.Services.AddDbContext<PubContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("PubConnection"))
@@ -49,7 +50,11 @@ app.MapGet("/weatherforecast", () =>
 
 app.MapAuthorEndpoints();
 
+app.MapBookEndpoints();
+
 app.Run();
+
+
 
 public record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
