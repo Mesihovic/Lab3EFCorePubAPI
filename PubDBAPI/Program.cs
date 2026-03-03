@@ -7,7 +7,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // OpenAPI + Swagger
 builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddControllers().AddJsonOptions(o =>
+    o.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles);
+
+
+
 
 
 // DbContext
@@ -48,9 +55,12 @@ app.MapGet("/weatherforecast", () =>
 })
 .WithName("GetWeatherForecast");
 
-app.MapAuthorEndpoints();
+
 
 app.MapBookEndpoints();
+
+
+app.MapControllers();
 
 app.Run();
 
