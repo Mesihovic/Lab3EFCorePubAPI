@@ -14,9 +14,6 @@ builder.Services.AddControllers().AddJsonOptions(o =>
     o.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles);
 
 
-
-
-
 // DbContext
 builder.Services.AddDbContext<PubContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("PubConnection"))
